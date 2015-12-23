@@ -16,9 +16,13 @@ fi
 
 DISABLE="--disable-w32threads --disable-iconv --disable-libxcb --disable-opencl --disable-sdl --disable-everything"
 ENABLE="--enable-pthreads --enable-avfilter --enable-filters --enable-shared --enable-gpl --enable-version3 --enable-postproc --enable-nonfree --enable-runtime-cpudetect --enable-hwaccels"
-ENABLE="$ENABLE --enable-libopenh264 --enable-libx264" 
-ENABLE="$ENABLE --enable-decoders --enable-parsers --enable-demuxers"
-ENABLE="$ENABLE --enable-encoder=libopenh264,libx264,h264,nvenc_h264,aac"
+ENABLE="$ENABLE --enable-libx264" 
+
+ENABLE="$ENABLE --enable-decoder=png,mpeg4,libx264,h264,h263,nvenc_h264,aac,aac_latm"
+ENABLE="$ENABLE --enable-parser=png,mpeg4video,libx264,h264,h263,nvenc_h264,aac,aac_latm"
+ENABLE="$ENABLE --enable-demuxer=image2,mov,mp4,libx264,h264,h263,nvenc_h264,aac"
+
+ENABLE="$ENABLE --enable-encoder=libx264,h264,nvenc_h264,aac"
 ENABLE="$ENABLE --enable-muxer=mp4"
 ENABLE="$ENABLE --enable-protocol=file,http"
 
@@ -42,28 +46,28 @@ else
     X265=x265_1.8
     VPX_VERSION=v1.5.0
     FFMPEG_VERSION=2.8.3
-    download http://downloads.sourceforge.net/project/lame/lame/3.99/$LAME.tar.gz $LAME.tar.gz
-    download http://downloads.xiph.org/releases/speex/$SPEEX.tar.gz $SPEEX.tar.gz
-    download http://sourceforge.net/projects/opencore-amr/files/opencore-amr/$OPENCORE_AMR.tar.gz/download $OPENCORE_AMR.tar.gz
-    download https://www.openssl.org/source/$OPENSSL.tar.gz $OPENSSL.tar.gz
-    download https://github.com/cisco/openh264/archive/v$OPENH264_VERSION.tar.gz openh264-$OPENH264_VERSION.tar.gz
+    # download http://downloads.sourceforge.net/project/lame/lame/3.99/$LAME.tar.gz $LAME.tar.gz
+    # download http://downloads.xiph.org/releases/speex/$SPEEX.tar.gz $SPEEX.tar.gz
+    # download http://sourceforge.net/projects/opencore-amr/files/opencore-amr/$OPENCORE_AMR.tar.gz/download $OPENCORE_AMR.tar.gz
+    # download https://www.openssl.org/source/$OPENSSL.tar.gz $OPENSSL.tar.gz
+    # download https://github.com/cisco/openh264/archive/v$OPENH264_VERSION.tar.gz openh264-$OPENH264_VERSION.tar.gz
     download ftp://ftp.videolan.org/pub/videolan/x264/snapshots/last_stable_x264.tar.bz2 last_stable_x264.tar.bz2
-    download https://ftp.videolan.org/pub/videolan/x265/$X265.tar.gz $X265.tar.gz
-    download https://chromium.googlesource.com/webm/libvpx/+archive/$VPX_VERSION.tar.gz libvpx-$VPX_VERSION.tar.gz
+    # download https://ftp.videolan.org/pub/videolan/x265/$X265.tar.gz $X265.tar.gz
+    # download https://chromium.googlesource.com/webm/libvpx/+archive/$VPX_VERSION.tar.gz libvpx-$VPX_VERSION.tar.gz
     download http://ffmpeg.org/releases/ffmpeg-$FFMPEG_VERSION.tar.bz2 ffmpeg-$FFMPEG_VERSION.tar.bz2
 
     mkdir -p $PLATFORM
     cd $PLATFORM
     INSTALL_PATH=`pwd`
-    tar -xzvf ../$LAME.tar.gz
-    tar -xzvf ../$SPEEX.tar.gz
-    tar -xzvf ../$OPENCORE_AMR.tar.gz
-    tar -xzvf ../$OPENSSL.tar.gz
-    tar -xzvf ../openh264-$OPENH264_VERSION.tar.gz
+    # tar -xzvf ../$LAME.tar.gz
+    # tar -xzvf ../$SPEEX.tar.gz
+    # tar -xzvf ../$OPENCORE_AMR.tar.gz
+    # tar -xzvf ../$OPENSSL.tar.gz
+    # tar -xzvf ../openh264-$OPENH264_VERSION.tar.gz
     tar -xjvf ../last_stable_x264.tar.bz2
-    tar -xzvf ../$X265.tar.gz
-    mkdir -p libvpx-$VPX_VERSION
-    tar -xzvf ../libvpx-$VPX_VERSION.tar.gz -C libvpx-$VPX_VERSION
+    # tar -xzvf ../$X265.tar.gz
+    # mkdir -p libvpx-$VPX_VERSION
+    # tar -xzvf ../libvpx-$VPX_VERSION.tar.gz -C libvpx-$VPX_VERSION
     tar -xjvf ../ffmpeg-$FFMPEG_VERSION.tar.bz2
     # First, fix one file for values removed from libvpx-1.5.0:
     # http://www.linuxfromscratch.org/blfs/view/svn/multimedia/ffmpeg.html
@@ -101,9 +105,9 @@ case $PLATFORM in
         # CROSS_COMPILE="$ANDROID_BIN-" ./Configure android-armv7 -DANDROID -fPIC -ffunction-sections -funwind-tables -fstack-protector -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -fomit-frame-pointer -fstrict-aliasing -funswitch-loops -finline-limit=300 no-shared --prefix=$INSTALL_PATH
         # ANDROID_DEV="$ANDROID_ROOT/usr" make # fails with -j > 1
         # make install
-        cd openh264-$OPENH264_VERSION
-        make -j $MAKEJ PREFIX=$INSTALL_PATH OS=android ARCH=arm USE_ASM=No NDKROOT="$ANDROID_NDK" TARGET="$ANDROID_ROOT" libraries install-static
-        cd ../$X264
+        # cd openh264-$OPENH264_VERSION
+        # make -j $MAKEJ PREFIX=$INSTALL_PATH OS=android ARCH=arm USE_ASM=No NDKROOT="$ANDROID_NDK" TARGET="$ANDROID_ROOT" libraries install-static
+        cd $X264
         ./configure --prefix=$INSTALL_PATH --enable-static --enable-pic --disable-cli --cross-prefix="$ANDROID_BIN-" --sysroot="$ANDROID_ROOT" --host=arm-linux --extra-cflags="-DANDROID -fPIC -ffunction-sections -funwind-tables -fstack-protector -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -fomit-frame-pointer -fstrict-aliasing -funswitch-loops -finline-limit=300" --extra-ldflags="-nostdlib -Wl,--fix-cortex-a8 -lgcc -ldl -lz -lm -lc"
         make -j $MAKEJ
         make install
